@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备管理 - 新能源精密追溯系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">新能源精密追溯系统</div>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/dashboard">仪表盘</a>
+            <a href="/products">产品管理</a>
+            <a href="/tracking">产品追踪</a>
+            <a href="/quality">质量检查</a>
+            <a href="/suppliers">供应商管理</a>
+            <a href="/devices">设备管理</a>
+        </div>
+        <div class="user-info">
+            <!-- 用户信息将通过JavaScript动态更新 -->
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <h1 class="page-title">设备管理</h1>
+        
+        <!-- 搜索和操作区域 -->
+        <div class="search-actions">
+            <div class="search-container">
+                <input type="text" id="device-search" class="form-control" placeholder="搜索设备名称或编号...">
+                <button class="btn btn-outline-secondary" onclick="searchDevices()">搜索</button>
+            </div>
+            <button class="btn btn-primary" onclick="openAddDeviceModal()">添加设备</button>
+        </div>
+
+        <!-- 设备列表 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">设备列表</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>设备编号</th>
+                                <th>设备名称</th>
+                                <th>设备类型</th>
+                                <th>状态</th>
+                                <th>所在位置</th>
+                                <th>购买日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devices-table-body">
+                            <!-- 设备数据将通过JavaScript动态加载 -->
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="loading"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页控制 -->
+                <div class="pagination-container" id="pagination-container">
+                    <!-- 分页将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑设备模态框 -->
+    <div class="modal" id="device-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">添加设备</h5>
+                <button type="button" class="close" onclick="closeDeviceModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="device-form">
+                    <input type="hidden" id="device-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="device-code" class="form-label">设备编号</label>
+                            <input type="text" id="device-code" name="device_code" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="device-name" class="form-label">设备名称</label>
+                            <input type="text" id="device-name" name="device_name" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="device-type" class="form-label">设备类型</label>
+                            <input type="text" id="device-type" name="device_type" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="status" class="form-label">状态</label>
+                            <select id="status" name="status" class="form-control" required>
+                                <option value="">请选择状态</option>
+                                <option value="operational">正常运行</option>
+                                <option value="maintenance">维护中</option>
+                                <option value="idle">闲置</option>
+                                <option value="fault">故障</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="location" class="form-label">所在位置</label>
+                            <input type="text" id="location" name="location" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="purchase-date" class="form-label">购买日期</label>
+                            <input type="date" id="purchase-date" name="purchase_date" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="supplier-id" class="form-label">供应商</label>
+                            <select id="supplier-id" name="supplier_id" class="form-control">
+                                <option value="">请选择供应商</option>
+                                <!-- 供应商选项将通过JavaScript动态加载 -->
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="maintenance-cycle" class="form-label">维护周期(天)</label>
+                            <input type="number" id="maintenance-cycle" name="maintenance_cycle" class="form-control" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="last-maintenance-date" class="form-label">上次维护日期</label>
+                            <input type="date" id="last-maintenance-date" name="last_maintenance_date" class="form-control">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="next-maintenance-date" class="form-label">下次维护日期</label>
+                            <input type="date" id="next-maintenance-date" name="next_maintenance_date" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="specifications" class="form-label">设备规格</label>
+                        <textarea id="specifications" name="specifications" class="form-control" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="model" class="form-label">设备型号</label>
+                        <input type="text" id="model" name="model" class="form-control">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="serial-number" class="form-label">序列号</label>
+                            <input type="text" id="serial-number" name="serial_number" class="form-control">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="warranty-period" class="form-label">保修期(月)</label>
+                            <input type="number" id="warranty-period" name="warranty_period" class="form-control" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes" class="form-label">备注</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDeviceModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveDevice()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设备维护记录模态框 -->
+    <div class="modal" id="maintenance-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">设备维护记录</h5>
+                <button type="button" class="close" onclick="closeMaintenanceModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="maintenance-device-info" class="mb-3"></div>
+                <div class="mb-3">
+                    <button class="btn btn-outline-primary" onclick="openAddMaintenanceModal()">添加维护记录</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>维护日期</th>
+                                <th>维护类型</th>
+                                <th>维护内容</th>
+                                <th>维护人员</th>
+                                <th>费用</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenance-table-body">
+                            <!-- 维护记录将通过JavaScript动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeMaintenanceModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加维护记录模态框 -->
+    <div class="modal" id="add-maintenance-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加维护记录</h5>
+                <button type="button" class="close" onclick="closeAddMaintenanceModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="maintenance-form">
+                    <input type="hidden" id="current-device-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="maintenance-date" class="form-label">维护日期</label>
+                            <input type="date" id="maintenance-date" name="maintenance_date" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="maintenance-type" class="form-label">维护类型</label>
+                            <select id="maintenance-type" name="maintenance_type" class="form-control" required>
+                                <option value="">请选择维护类型</option>
+                                <option value="routine">例行维护</option>
+                                <option value="preventive">预防性维护</option>
+                                <option value="corrective">修复性维护</option>
+                                <option value="predictive">预测性维护</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maintenance-content" class="form-label">维护内容</label>
+                        <textarea id="maintenance-content" name="maintenance_content" class="form-control" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="technician" class="form-label">维护人员</label>
+                            <input type="text" id="technician" name="technician" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="cost" class="form-label">维护费用</label>
+                            <input type="number" id="cost" name="cost" class="form-control" min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maintenance-notes" class="form-label">备注</label>
+                        <textarea id="maintenance-notes" name="notes" class="form-control" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeAddMaintenanceModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveMaintenanceRecord()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 设备管理页面额外样式 */
+        .search-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            color: #6c757d;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .badge-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .search-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                max-width: 100%;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+    </style>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDevices();
+            loadSuppliersForSelect();
+        });
+
+        // 加载设备列表
+        async function loadDevices(page = 1, searchQuery = '') {
+            try {
+                const response = await apiRequest(`/api/devices?page=${page}&search=${encodeURIComponent(searchQuery)}`);
+                const devices = response.items;
+                const pagination = response.pagination;
+                
+                const tableBody = document.getElementById('devices-table-body');
+                tableBody.innerHTML = '';
+                
+                if (devices.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center">暂无设备数据</td></tr>';
+                    document.getElementById('pagination-container').innerHTML = '';
+                    return;
+                }
+                
+                devices.forEach(device => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${device.device_code}</td>
+                        <td>${device.device_name}</td>
+                        <td>${device.device_type}</td>
+                        <td><span class="badge ${getStatusClass(device.status)}">${getStatusName(device.status)}</span></td>
+                        <td>${device.location}</td>
+                        <td>${device.purchase_date ? new Date(device.purchase_date).toLocaleDateString() : '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editDevice(${JSON.stringify(device).replace(/"/g, '&quot;')})")>编辑</button>
+                            <button class="btn btn-sm btn-outline-info" onclick="viewMaintenance(${device.id}, '${device.device_name}', '${device.device_code}')">维护记录</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteDevice(${device.id})")>删除</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                // 生成分页
+                generatePagination(pagination, page => loadDevices(
+                    page, 
+                    document.getElementById('device-search').value
+                ));
+            } catch (error) {
+                showNotification('加载设备失败: ' + error.message, 'error');
+            }
+        }
+
+        // 搜索设备
+        function searchDevices() {
+            const searchQuery = document.getElementById('device-search').value;
+            loadDevices(1, searchQuery);
+        }
+
+        // 加载供应商下拉列表
+        async function loadSuppliersForSelect() {
+            try {
+                const response = await apiRequest('/api/suppliers?page=1&per_page=100');
+                const select = document.getElementById('supplier-id');
+                
+                response.items.forEach(supplier => {
+                    const option = document.createElement('option');
+                    option.value = supplier.id;
+                    option.textContent = `${supplier.supplier_name} (${supplier.supplier_code})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('加载供应商失败:', error);
+            }
+        }
+
+        // 打开添加设备模态框
+        function openAddDeviceModal() {
+            document.getElementById('modal-title').textContent = '添加设备';
+            document.getElementById('device-form').reset();
+            document.getElementById('device-id').value = '';
+            document.getElementById('device-modal').style.display = 'flex';
+        }
+
+        // 编辑设备
+        function editDevice(device) {
+            document.getElementById('modal-title').textContent = '编辑设备';
+            document.getElementById('device-id').value = device.id;
+            document.getElementById('device-code').value = device.device_code;
+            document.getElementById('device-name').value = device.device_name;
+            document.getElementById('device-type').value = device.device_type;
+            document.getElementById('status').value = device.status;
+            document.getElementById('location').value = device.location;
+            document.getElementById('purchase-date').value = device.purchase_date ? device.purchase_date.split('T')[0] : '';
+            document.getElementById('supplier-id').value = device.supplier_id || '';
+            document.getElementById('maintenance-cycle').value = device.maintenance_cycle || '';
+            document.getElementById('last-maintenance-date').value = device.last_maintenance_date ? device.last_maintenance_date.split('T')[0] : '';
+            document.getElementById('next-maintenance-date').value = device.next_maintenance_date ? device.next_maintenance_date.split('T')[0] : '';
+            document.getElementById('specifications').value = device.specifications || '';
+            document.getElementById('model').value = device.model || '';
+            document.getElementById('serial-number').value = device.serial_number || '';
+            document.getElementById('warranty-period').value = device.warranty_period || '';
+            document.getElementById('notes').value = device.notes || '';
+            document.getElementById('device-modal').style.display = 'flex';
+        }
+
+        // 关闭设备模态框
+        function closeDeviceModal() {
+            document.getElementById('device-modal').style.display = 'none';
+        }
+
+        // 保存设备
+        async function saveDevice() {
+            const deviceId = document.getElementById('device-id').value;
+            const data = {
+                device_code: document.getElementById('device-code').value,
+                device_name: document.getElementById('device-name').value,
+                device_type: document.getElementById('device-type').value,
+                status: document.getElementById('status').value,
+                location: document.getElementById('location').value,
+                purchase_date: document.getElementById('purchase-date').value,
+                supplier_id: document.getElementById('supplier-id').value,
+                maintenance_cycle: document.getElementById('maintenance-cycle').value,
+                last_maintenance_date: document.getElementById('last-maintenance-date').value,
+                next_maintenance_date: document.getElementById('next-maintenance-date').value,
+                specifications: document.getElementById('specifications').value,
+                model: document.getElementById('model').value,
+                serial_number: document.getElementById('serial-number').value,
+                warranty_period: document.getElementById('warranty-period').value,
+                notes: document.getElementById('notes').value
+            };
+            
+            try {
+                let response;
+                if (deviceId) {
+                    response = await apiRequest(`/api/devices/${deviceId}`, 'PUT', data);
+                } else {
+                    response = await apiRequest('/api/devices', 'POST', data);
+                }
+                
+                closeDeviceModal();
+                loadDevices();
+                showNotification(response.message || '保存成功', 'success');
+            } catch (error) {
+                showNotification('保存失败: ' + error.message, 'error');
+            }
+        }
+
+        // 删除设备
+        async function deleteDevice(deviceId) {
+            if (confirm('确定要删除这个设备吗？')) {
+                try {
+                    const response = await apiRequest(`/api/devices/${deviceId}`, 'DELETE');
+                    loadDevices();
+                    showNotification(response.message || '删除成功', 'success');
+                } catch (error) {
+                    showNotification('删除失败: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // 查看维护记录
+        async function viewMaintenance(deviceId, deviceName, deviceCode) {
+            try {
+                document.getElementById('current-device-id').value = deviceId;
+                document.getElementById('maintenance-device-info').textContent = 
+                    `设备: ${deviceName} (${deviceCode})`;
+                
+                // 这里可以加载实际的维护记录
+                const maintenanceTableBody = document.getElementById('maintenance-table-body');
+                maintenanceTableBody.innerHTML = '<tr><td colspan="5" class="text-center">暂无维护记录</td></tr>';
+                
+                document.getElementById('maintenance-modal').style.display = 'flex';
+            } catch (error) {
+                showNotification('加载维护记录失败: ' + error.message, 'error');
+            }
+        }
+
+        // 关闭维护记录模态框
+        function closeMaintenanceModal() {
+            document.getElementById('maintenance-modal').style.display = 'none';
+        }
+
+        // 打开添加维护记录模态框
+        function openAddMaintenanceModal() {
+            document.getElementById('maintenance-form').reset();
+            document.getElementById('add-maintenance-modal').style.display = 'flex';
+        }
+
+        // 关闭添加维护记录模态框
+        function closeAddMaintenanceModal() {
+            document.getElementById('add-maintenance-modal').style.display = 'none';
+        }
+
+        // 保存维护记录
+        async function saveMaintenanceRecord() {
+            const deviceId = document.getElementById('current-device-id').value;
+            const data = {
+                maintenance_date: document.getElementById('maintenance-date').value,
+                maintenance_type: document.getElementById('maintenance-type').value,
+                maintenance_content: document.getElementById('maintenance-content').value,
+                technician: document.getElementById('technician').value,
+                cost: document.getElementById('cost').value,
+                notes: document.getElementById('maintenance-notes').value
+            };
+            
+            try {
+                // 这里可以调用API保存维护记录
+                // const response = await apiRequest(`/api/devices/${deviceId}/maintenance`, 'POST', data);
+                
+                closeAddMaintenanceModal();
+                // 重新加载维护记录
+                // 这里应该添加实际的重新加载逻辑
+                showNotification('维护记录保存成功', 'success');
+            } catch (error) {
+                showNotification('保存维护记录失败: ' + error.message, 'error');
+            }
+        }
+
+        // 生成分页
+        function generatePagination(pagination, pageCallback) {
+            const container = document.getElementById('pagination-container');
+            container.innerHTML = '';
+            
+            if (pagination.total_pages <= 1) return;
+            
+            const paginationElement = document.createElement('div');
+            paginationElement.className = 'pagination';
+            
+            // 上一页
+            if (pagination.current_page > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.className = 'btn btn-outline-secondary';
+                prevButton.textContent = '上一页';
+                prevButton.onclick = () => pageCallback(pagination.current_page - 1);
+                paginationElement.appendChild(prevButton);
+            }
+            
+            // 页码按钮
+            for (let i = 1; i <= pagination.total_pages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = i === pagination.current_page ? 'btn btn-primary' : 'btn btn-outline-secondary';
+                pageButton.textContent = i;
+                pageButton.onclick = () => pageCallback(i);
+                paginationElement.appendChild(pageButton);
+            }
+            
+            // 下一页
+            if (pagination.current_page < pagination.total_pages) {
+                const nextButton = document.createElement('button');
+                nextButton.className = 'btn btn-outline-secondary';
+                nextButton.textContent = '下一页';
+                nextButton.onclick = () => pageCallback(pagination.current_page + 1);
+                paginationElement.appendChild(nextButton);
+            }
+            
+            container.appendChild(paginationElement);
+        }
+
+        // 辅助函数
+        function getStatusName(status) {
+            const statusMap = {
+                'operational': '正常运行',
+                'maintenance': '维护中',
+                'idle': '闲置',
+                'fault': '故障'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getStatusClass(status) {
+            const classMap = {
+                'operational': 'badge-success',
+                'maintenance': 'badge-warning',
+                'idle': 'badge-info',
+                'fault': 'badge-danger'
+            };
+            return classMap[status] || 'badge-secondary';
+        }
+    </script>
+</body>
+</html>

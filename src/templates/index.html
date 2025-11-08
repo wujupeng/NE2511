@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新能源精密追溯系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">新能源精密追溯系统</div>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/dashboard">仪表盘</a>
+            <a href="/products">产品管理</a>
+            <a href="/tracking">产品追踪</a>
+            <a href="/quality">质量检查</a>
+            <a href="/suppliers">供应商管理</a>
+            <a href="/devices">设备管理</a>
+        </div>
+        <div class="user-info">
+            <a href="/login" class="btn btn-secondary">登录</a>
+            <a href="/register" class="btn btn-primary">注册</a>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>新能源精密追溯系统</h1>
+                <p>基于区块链技术的新能源产品全生命周期追溯解决方案</p>
+                <div class="hero-buttons">
+                    <a href="/login" class="btn btn-primary btn-lg">立即登录</a>
+                    <a href="/register" class="btn btn-secondary btn-lg">免费注册</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特点 -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">核心功能</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h3>产品全生命周期管理</h3>
+                    <p>从原材料采购到生产、销售、售后服务的全过程追踪管理</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3>区块链数据存储</h3>
+                    <p>利用区块链技术确保数据不可篡改，提高追溯数据的可信度</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>二维码快速追溯</h3>
+                    <p>通过扫描产品二维码，快速获取产品的全部生产和质量信息</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>数据分析与可视化</h3>
+                    <p>实时监控生产质量，提供多维度数据分析和报表生成</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>设备管理</h3>
+                    <p>管理生产设备的运行状态、维护记录，确保生产过程稳定</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h3>质量管控</h3>
+                    <p>严格的质量检查流程，确保每一件产品都符合标准</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 系统架构 -->
+    <section class="architecture">
+        <div class="container">
+            <h2 class="section-title">系统架构</h2>
+            <div class="architecture-content">
+                <div class="architecture-diagram">
+                    <!-- 这里可以放系统架构图 -->
+                    <div class="architecture-layer">
+                        <h3>前端应用层</h3>
+                        <p>响应式Web界面，支持PC和移动设备访问</p>
+                    </div>
+                    <div class="architecture-layer">
+                        <h3>API服务层</h3>
+                        <p>RESTful API接口，提供数据访问和业务逻辑处理</p>
+                    </div>
+                    <div class="architecture-layer">
+                        <h3>数据存储层</h3>
+                        <p>MySQL关系数据库 + MongoDB非关系数据库 + Redis缓存 + 区块链存储</p>
+                    </div>
+                    <div class="architecture-layer">
+                        <h3>设备接入层</h3>
+                        <p>支持各种物联网设备的数据采集和接入</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>新能源精密追溯系统</h3>
+                    <p>为新能源行业提供专业的产品追溯解决方案</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#">关于我们</a>
+                    <a href="#">联系方式</a>
+                    <a href="#">技术支持</a>
+                    <a href="#">隐私政策</a>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2023 新能源精密追溯系统. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* 首页特有样式 */
+        .hero {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 6rem 0;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .features {
+            padding: 4rem 0;
+            background-color: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #6c757d;
+        }
+
+        .architecture {
+            padding: 4rem 0;
+            background-color: #f8f9fa;
+        }
+
+        .architecture-diagram {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .architecture-layer {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+
+        .architecture-layer h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #007bff;
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 3rem 0;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        .footer-copyright {
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

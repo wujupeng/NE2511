@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 新能源精密追溯系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1 class="login-title">新能源精密追溯系统</h1>
+            <p>创建新账号</p>
+        </div>
+        
+        <form id="register-form" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label for="username" class="form-label">用户名</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email" class="form-label">邮箱</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">密码</label>
+                <input type="password" id="password" name="password" class="form-control" required minlength="6">
+                <small class="form-text">密码至少6个字符</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">确认密码</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="role" class="form-label">用户角色</label>
+                <select id="role" name="role" class="form-control" required>
+                    <option value="">请选择角色</option>
+                    <option value="admin">管理员</option>
+                    <option value="operator">操作员</option>
+                    <option value="quality_manager">质量管理员</option>
+                    <option value="supplier">供应商</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary w-100">注册</button>
+            </div>
+            
+            <div class="login-footer">
+                <p>已有账号？ <a href="/login">立即登录</a></p>
+            </div>
+        </form>
+    </div>
+
+    <style>
+        /* 注册页面额外样式 */
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            max-width: 450px;
+            width: 100%;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #6c757d;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        .form-text {
+            display: block;
+            margin-top: 0.25rem;
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .login-footer p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .login-footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+
+    <script>
+        // 处理注册表单提交
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const role = document.getElementById('role').value;
+            
+            // 验证密码是否匹配
+            if (password !== confirmPassword) {
+                alert('两次输入的密码不一致');
+                return;
+            }
+            
+            try {
+                // 禁用按钮并显示加载状态
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<div class="loading"></div>';
+                
+                // 发送注册请求
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        username, 
+                        email, 
+                        password, 
+                        role 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('注册成功，请登录');
+                    // 重定向到登录页面
+                    window.location.href = '/login';
+                } else {
+                    throw new Error(data.message || '注册失败');
+                }
+            } catch (error) {
+                // 显示错误消息
+                alert(error.message);
+            } finally {
+                // 恢复按钮状态
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '注册';
+            }
+        }
+    </script>
+</body>
+</html>

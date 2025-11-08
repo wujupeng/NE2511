@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品追踪 - 新能源精密追溯系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">新能源精密追溯系统</div>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/dashboard">仪表盘</a>
+            <a href="/products">产品管理</a>
+            <a href="/tracking">产品追踪</a>
+            <a href="/quality">质量检查</a>
+            <a href="/suppliers">供应商管理</a>
+            <a href="/devices">设备管理</a>
+        </div>
+        <div class="user-info">
+            <!-- 用户信息将通过JavaScript动态更新 -->
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <h1 class="page-title">产品追踪</h1>
+        
+        <!-- 追踪搜索区域 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">追踪搜索</h3>
+            </div>
+            <div class="card-body">
+                <div class="search-container">
+                    <input type="text" id="tracking-search" class="form-control" placeholder="输入产品编码或扫描二维码...">
+                    <button class="btn btn-primary" onclick="trackProduct()">追踪</button>
+                    <button class="btn btn-outline-secondary" onclick="openScanner()">扫描二维码</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 追踪结果区域 -->
+        <div id="tracking-result" class="mt-4" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">追踪结果</h3>
+                </div>
+                <div class="card-body">
+                    <!-- 产品基本信息 -->
+                    <div class="product-info" id="product-info">
+                        <!-- 产品信息将通过JavaScript动态加载 -->
+                    </div>
+                    
+                    <!-- 追踪历史时间线 -->
+                    <div class="tracking-timeline mt-4">
+                        <h4>追踪历史</h4>
+                        <div id="timeline-items">
+                            <!-- 时间线项目将通过JavaScript动态加载 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 追踪数据管理区域 -->
+        <div class="mt-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">追踪数据管理</h3>
+                    <button class="btn btn-primary btn-sm" onclick="openAddTrackingModal()">添加追踪记录</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>产品编码</th>
+                                    <th>追踪状态</th>
+                                    <th>当前位置</th>
+                                    <th>负责人</th>
+                                    <th>更新时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tracking-data-table-body">
+                                <!-- 追踪数据将通过JavaScript动态加载 -->
+                                <tr>
+                                    <td colspan="7" class="text-center">
+                                        <div class="loading"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 二维码扫描模态框 -->
+    <div class="modal" id="scanner-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">扫描二维码</h5>
+                <button type="button" class="close" onclick="closeScanner()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="qr-reader"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeScanner()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加追踪记录模态框 -->
+    <div class="modal" id="tracking-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加追踪记录</h5>
+                <button type="button" class="close" onclick="closeTrackingModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="tracking-form">
+                    <div class="form-group">
+                        <label for="tracking-product-code" class="form-label">产品编码</label>
+                        <input type="text" id="tracking-product-code" name="product_code" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tracking-status" class="form-label">追踪状态</label>
+                        <select id="tracking-status" name="status" class="form-control" required>
+                            <option value="">请选择状态</option>
+                            <option value="production">生产中</option>
+                            <option value="quality_check">质量检查</option>
+                            <option value="packaging">包装中</option>
+                            <option value="shipping">运输中</option>
+                            <option value="delivered">已交付</option>
+                            <option value="returned">已退回</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tracking-location" class="form-label">当前位置</label>
+                        <input type="text" id="tracking-location" name="location" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tracking-operator" class="form-label">操作人员</label>
+                        <input type="text" id="tracking-operator" name="operator" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tracking-device-id" class="form-label">使用设备</label>
+                        <select id="tracking-device-id" name="device_id" class="form-control" required>
+                            <!-- 设备数据将通过JavaScript动态加载 -->
+                            <option value="">请选择设备</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tracking-notes" class="form-label">备注</label>
+                        <textarea id="tracking-notes" name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeTrackingModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveTrackingRecord()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 产品追踪页面额外样式 */
+        .search-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-container .form-control {
+            flex: 1;
+        }
+
+        .product-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .tracking-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #007bff;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: -1.7rem;
+            top: 12px;
+            width: 2px;
+            height: calc(100% - 12px);
+            background-color: #e9ecef;
+        }
+
+        .timeline-date {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-details {
+            font-size: 0.875rem;
+            color: #495057;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .badge-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .badge-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                flex-wrap: wrap;
+            }
+            
+            .search-container .btn {
+                flex: 1;
+                min-width: 120px;
+            }
+            
+            .product-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+    </style>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTrackingData();
+            loadDevices();
+        });
+
+        // 追踪产品
+        async function trackProduct() {
+            const productCode = document.getElementById('tracking-search').value.trim();
+            if (!productCode) {
+                showNotification('请输入产品编码', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await apiRequest(`/api/tracking/history?product_code=${encodeURIComponent(productCode)}`);
+                
+                // 显示追踪结果
+                document.getElementById('tracking-result').style.display = 'block';
+                
+                // 更新产品信息
+                updateProductInfo(response.product);
+                
+                // 更新时间线
+                updateTimeline(response.history);
+            } catch (error) {
+                showNotification('追踪失败: ' + error.message, 'error');
+            }
+        }
+
+        // 更新产品信息
+        function updateProductInfo(product) {
+            const container = document.getElementById('product-info');
+            container.innerHTML = `
+                <div class="info-card">
+                    <div class="info-label">产品编码</div>
+                    <div class="info-value">${product.product_code}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">产品名称</div>
+                    <div class="info-value">${product.product_name}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">批次</div>
+                    <div class="info-value">${product.batch_number}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">当前状态</div>
+                    <div class="info-value">${getStatusName(product.status)}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">最后更新时间</div>
+                    <div class="info-value">${formatDate(product.updated_at)}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">QR Code</div>
+                    <div class="info-value" id="product-qrcode">
+                        <!-- QR码将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            `;
+            
+            // 生成QR码
+            generateQRCode(`/api/tracking/qrcode?product_code=${encodeURIComponent(product.product_code)}`, 'product-qrcode');
+        }
+
+        // 更新时间线
+        function updateTimeline(history) {
+            const container = document.getElementById('timeline-items');
+            container.innerHTML = '';
+            
+            if (history.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted">暂无追踪记录</div>';
+                return;
+            }
+            
+            history.forEach(item => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                timelineItem.innerHTML = `
+                    <div class="timeline-date">${formatDateTime(item.timestamp)}</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">
+                            <span class="badge ${getStatusClass(item.status)}">${getStatusName(item.status)}</span>
+                            ${getLocationLabel(item.location)}
+                        </div>
+                        <div class="timeline-details">
+                            <p>操作人员: ${item.operator || '-'}</p>
+                            <p>备注: ${item.notes || '-'}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(timelineItem);
+            });
+        }
+
+        // 打开扫描器
+        function openScanner() {
+            document.getElementById('scanner-modal').style.display = 'flex';
+            // 这里可以集成实际的QR码扫描库
+            document.getElementById('qr-reader').innerHTML = '<p class="text-center text-muted">QR码扫描功能需要集成专用扫描库</p>';
+        }
+
+        // 关闭扫描器
+        function closeScanner() {
+            document.getElementById('scanner-modal').style.display = 'none';
+        }
+
+        // 加载追踪数据
+        async function loadTrackingData() {
+            try {
+                const response = await apiRequest('/api/tracking?page=1');
+                const trackingData = response.items;
+                
+                const tableBody = document.getElementById('tracking-data-table-body');
+                tableBody.innerHTML = '';
+                
+                if (trackingData.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center">暂无追踪数据</td></tr>';
+                    return;
+                }
+                
+                trackingData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.product_code}</td>
+                        <td><span class="badge ${getStatusClass(item.status)}">${getStatusName(item.status)}</span></td>
+                        <td>${item.location}</td>
+                        <td>${item.operator || '-'}</td>
+                        <td>${formatDateTime(item.timestamp)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editTrackingRecord(${JSON.stringify(item).replace(/"/g, '&quot;')})")>编辑</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                showNotification('加载追踪数据失败: ' + error.message, 'error');
+            }
+        }
+
+        // 打开添加追踪记录模态框
+        function openAddTrackingModal() {
+            document.getElementById('tracking-form').reset();
+            document.getElementById('tracking-modal').style.display = 'flex';
+        }
+
+        // 编辑追踪记录
+        function editTrackingRecord(record) {
+            document.getElementById('tracking-product-code').value = record.product_code;
+            document.getElementById('tracking-status').value = record.status;
+            document.getElementById('tracking-location').value = record.location;
+            document.getElementById('tracking-operator').value = record.operator;
+            document.getElementById('tracking-device-id').value = record.device_id || '';
+            document.getElementById('tracking-notes').value = record.notes || '';
+            document.getElementById('tracking-modal').style.display = 'flex';
+        }
+
+        // 关闭追踪记录模态框
+        function closeTrackingModal() {
+            document.getElementById('tracking-modal').style.display = 'none';
+        }
+
+        // 保存追踪记录
+        async function saveTrackingRecord() {
+            const data = {
+                product_code: document.getElementById('tracking-product-code').value,
+                status: document.getElementById('tracking-status').value,
+                location: document.getElementById('tracking-location').value,
+                operator: document.getElementById('tracking-operator').value,
+                device_id: document.getElementById('tracking-device-id').value,
+                notes: document.getElementById('tracking-notes').value
+            };
+            
+            try {
+                const response = await apiRequest('/api/tracking', 'POST', data);
+                closeTrackingModal();
+                loadTrackingData();
+                showNotification(response.message || '保存成功', 'success');
+            } catch (error) {
+                showNotification('保存失败: ' + error.message, 'error');
+            }
+        }
+
+        // 加载设备列表
+        async function loadDevices() {
+            try {
+                const response = await apiRequest('/api/devices?page=1&limit=100');
+                const select = document.getElementById('tracking-device-id');
+                select.innerHTML = '<option value="">请选择设备</option>';
+                
+                response.items.forEach(device => {
+                    const option = document.createElement('option');
+                    option.value = device.id;
+                    option.textContent = device.device_name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('加载设备失败:', error);
+            }
+        }
+
+        // 辅助函数
+        function getStatusName(status) {
+            const statusMap = {
+                'production': '生产中',
+                'quality_check': '质量检查',
+                'packaging': '包装中',
+                'shipping': '运输中',
+                'delivered': '已交付',
+                'returned': '已退回',
+                'active': '激活',
+                'inactive': '停用',
+                'discontinued': '停产'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getStatusClass(status) {
+            const classMap = {
+                'production': 'badge-info',
+                'quality_check': 'badge-warning',
+                'packaging': 'badge-secondary',
+                'shipping': 'badge-primary',
+                'delivered': 'badge-success',
+                'returned': 'badge-danger',
+                'active': 'badge-success',
+                'inactive': 'badge-warning',
+                'discontinued': 'badge-danger'
+            };
+            return classMap[status] || 'badge-secondary';
+        }
+
+        function getLocationLabel(location) {
+            return location || '未知位置';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN');
+        }
+
+        function generateQRCode(data, containerId) {
+            // 简化的QR码显示，实际项目中应使用QR码生成库
+            document.getElementById(containerId).innerHTML = `
+                <div style="padding: 1rem; border: 1px solid #ddd; text-align: center;">
+                    <div style="font-family: monospace; font-size: 0.75rem;">QR CODE</div>
+                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #6c757d;">${data}</div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

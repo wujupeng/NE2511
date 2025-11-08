@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>质量检查 - 新能源精密追溯系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">新能源精密追溯系统</div>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/dashboard">仪表盘</a>
+            <a href="/products">产品管理</a>
+            <a href="/tracking">产品追踪</a>
+            <a href="/quality">质量检查</a>
+            <a href="/suppliers">供应商管理</a>
+            <a href="/devices">设备管理</a>
+        </div>
+        <div class="user-info">
+            <!-- 用户信息将通过JavaScript动态更新 -->
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <h1 class="page-title">质量检查</h1>
+        
+        <!-- 搜索和筛选区域 -->
+        <div class="search-filters">
+            <div class="search-container">
+                <input type="text" id="quality-search" class="form-control" placeholder="搜索产品编码或批次...">
+                <button class="btn btn-outline-secondary" onclick="searchQualityChecks()">搜索</button>
+            </div>
+            <div class="filter-container">
+                <select id="quality-status-filter" class="form-control">
+                    <option value="">所有状态</option>
+                    <option value="passed">通过</option>
+                    <option value="failed">未通过</option>
+                    <option value="pending">待检查</option>
+                </select>
+                <select id="quality-type-filter" class="form-control">
+                    <option value="">所有类型</option>
+                    <option value="incoming">来料检查</option>
+                    <option value="in-process">过程检查</option>
+                    <option value="final">成品检查</option>
+                </select>
+                <button class="btn btn-primary" onclick="openAddQualityCheckModal()">添加检查记录</button>
+            </div>
+        </div>
+
+        <!-- 质量检查统计卡片 -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-label">总检查数</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-value" id="stat-passed">0</div>
+                <div class="stat-label">通过数</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-value" id="stat-failed">0</div>
+                <div class="stat-label">未通过数</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value" id="stat-pending">0</div>
+                <div class="stat-label">待检查数</div>
+            </div>
+        </div>
+
+        <!-- 质量检查列表 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">质量检查记录</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>产品编码</th>
+                                <th>检查类型</th>
+                                <th>检查项目</th>
+                                <th>检查结果</th>
+                                <th>检查人员</th>
+                                <th>检查时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quality-checks-table-body">
+                            <!-- 质量检查记录将通过JavaScript动态加载 -->
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <div class="loading"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页控制 -->
+                <div class="pagination-container" id="pagination-container">
+                    <!-- 分页将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑质量检查记录模态框 -->
+    <div class="modal" id="quality-check-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加质量检查记录</h5>
+                <button type="button" class="close" onclick="closeQualityCheckModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="quality-check-form">
+                    <input type="hidden" id="quality-check-id">
+                    
+                    <div class="form-group">
+                        <label for="quality-product-code" class="form-label">产品编码</label>
+                        <input type="text" id="quality-product-code" name="product_code" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quality-type" class="form-label">检查类型</label>
+                        <select id="quality-type" name="check_type" class="form-control" required>
+                            <option value="">请选择检查类型</option>
+                            <option value="incoming">来料检查</option>
+                            <option value="in-process">过程检查</option>
+                            <option value="final">成品检查</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quality-items" class="form-label">检查项目</label>
+                        <textarea id="quality-items" name="check_items" class="form-control" rows="3" placeholder="每行一个检查项目" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quality-results" class="form-label">检查结果</label>
+                        <select id="quality-results" name="result" class="form-control" required>
+                            <option value="">请选择结果</option>
+                            <option value="passed">通过</option>
+                            <option value="failed">未通过</option>
+                            <option value="pending">待检查</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quality-inspector" class="form-label">检查人员</label>
+                        <input type="text" id="quality-inspector" name="inspector" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quality-notes" class="form-label">备注</label>
+                        <textarea id="quality-notes" name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeQualityCheckModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveQualityCheck()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 质量检查页面额外样式 */
+        .search-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .filter-container .form-control {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #6c757d;
+        }
+
+        .stat-card.success {
+            border-left-color: #28a745;
+        }
+
+        .stat-card.danger {
+            border-left-color: #dc3545;
+        }
+
+        .stat-card.warning {
+            border-left-color: #ffc107;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            color: #6c757d;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .search-filters {
+                flex-direction: column;
+            }
+            
+            .search-container,
+            .filter-container {
+                width: 100%;
+            }
+            
+            .filter-container .btn {
+                flex: 1;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+    </style>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQualityChecks();
+            loadQualityStats();
+        });
+
+        // 加载质量检查记录
+        async function loadQualityChecks(page = 1, searchQuery = '', statusFilter = '', typeFilter = '') {
+            try {
+                let url = `/api/quality?page=${page}`;
+                if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
+                if (statusFilter) url += `&status=${statusFilter}`;
+                if (typeFilter) url += `&type=${typeFilter}`;
+                
+                const response = await apiRequest(url);
+                const qualityChecks = response.items;
+                const pagination = response.pagination;
+                
+                const tableBody = document.getElementById('quality-checks-table-body');
+                tableBody.innerHTML = '';
+                
+                if (qualityChecks.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="8" class="text-center">暂无质量检查记录</td></tr>';
+                    document.getElementById('pagination-container').innerHTML = '';
+                    return;
+                }
+                
+                qualityChecks.forEach(check => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${check.id}</td>
+                        <td>${check.product_code}</td>
+                        <td>${getCheckTypeName(check.check_type)}</td>
+                        <td>${formatCheckItems(check.check_items)}</td>
+                        <td><span class="badge ${getResultClass(check.result)}">${getResultName(check.result)}</span></td>
+                        <td>${check.inspector}</td>
+                        <td>${formatDateTime(check.created_at)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editQualityCheck(${JSON.stringify(check).replace(/"/g, '&quot;')})")>编辑</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteQualityCheck(${check.id})")>删除</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                // 生成分页
+                generatePagination(pagination, page => loadQualityChecks(
+                    page, 
+                    document.getElementById('quality-search').value,
+                    document.getElementById('quality-status-filter').value,
+                    document.getElementById('quality-type-filter').value
+                ));
+            } catch (error) {
+                showNotification('加载质量检查记录失败: ' + error.message, 'error');
+            }
+        }
+
+        // 搜索和筛选质量检查记录
+        function searchQualityChecks() {
+            const searchQuery = document.getElementById('quality-search').value;
+            const statusFilter = document.getElementById('quality-status-filter').value;
+            const typeFilter = document.getElementById('quality-type-filter').value;
+            loadQualityChecks(1, searchQuery, statusFilter, typeFilter);
+        }
+
+        // 加载质量统计数据
+        async function loadQualityStats() {
+            try {
+                const response = await apiRequest('/api/quality/stats');
+                const stats = response.stats;
+                
+                document.getElementById('stat-total').textContent = stats.total || 0;
+                document.getElementById('stat-passed').textContent = stats.passed || 0;
+                document.getElementById('stat-failed').textContent = stats.failed || 0;
+                document.getElementById('stat-pending').textContent = stats.pending || 0;
+            } catch (error) {
+                console.error('加载质量统计失败:', error);
+            }
+        }
+
+        // 打开添加质量检查记录模态框
+        function openAddQualityCheckModal() {
+            document.getElementById('modal-title').textContent = '添加质量检查记录';
+            document.getElementById('quality-check-form').reset();
+            document.getElementById('quality-check-id').value = '';
+            document.getElementById('quality-check-modal').style.display = 'flex';
+        }
+
+        // 编辑质量检查记录
+        function editQualityCheck(check) {
+            document.getElementById('modal-title').textContent = '编辑质量检查记录';
+            document.getElementById('quality-check-id').value = check.id;
+            document.getElementById('quality-product-code').value = check.product_code;
+            document.getElementById('quality-type').value = check.check_type;
+            document.getElementById('quality-items').value = Array.isArray(check.check_items) ? check.check_items.join('\n') : check.check_items;
+            document.getElementById('quality-results').value = check.result;
+            document.getElementById('quality-inspector').value = check.inspector;
+            document.getElementById('quality-notes').value = check.notes || '';
+            document.getElementById('quality-check-modal').style.display = 'flex';
+        }
+
+        // 关闭质量检查记录模态框
+        function closeQualityCheckModal() {
+            document.getElementById('quality-check-modal').style.display = 'none';
+        }
+
+        // 保存质量检查记录
+        async function saveQualityCheck() {
+            const checkId = document.getElementById('quality-check-id').value;
+            const data = {
+                product_code: document.getElementById('quality-product-code').value,
+                check_type: document.getElementById('quality-type').value,
+                check_items: document.getElementById('quality-items').value.split('\n').filter(item => item.trim()),
+                result: document.getElementById('quality-results').value,
+                inspector: document.getElementById('quality-inspector').value,
+                notes: document.getElementById('quality-notes').value
+            };
+            
+            try {
+                let response;
+                if (checkId) {
+                    response = await apiRequest(`/api/quality/${checkId}`, 'PUT', data);
+                } else {
+                    response = await apiRequest('/api/quality', 'POST', data);
+                }
+                
+                closeQualityCheckModal();
+                loadQualityChecks();
+                loadQualityStats();
+                showNotification(response.message || '保存成功', 'success');
+            } catch (error) {
+                showNotification('保存失败: ' + error.message, 'error');
+            }
+        }
+
+        // 删除质量检查记录
+        async function deleteQualityCheck(checkId) {
+            if (confirm('确定要删除这个质量检查记录吗？')) {
+                try {
+                    const response = await apiRequest(`/api/quality/${checkId}`, 'DELETE');
+                    loadQualityChecks();
+                    loadQualityStats();
+                    showNotification(response.message || '删除成功', 'success');
+                } catch (error) {
+                    showNotification('删除失败: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // 生成分页
+        function generatePagination(pagination, pageCallback) {
+            const container = document.getElementById('pagination-container');
+            container.innerHTML = '';
+            
+            if (pagination.total_pages <= 1) return;
+            
+            const paginationElement = document.createElement('div');
+            paginationElement.className = 'pagination';
+            
+            // 上一页
+            if (pagination.current_page > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.className = 'btn btn-outline-secondary';
+                prevButton.textContent = '上一页';
+                prevButton.onclick = () => pageCallback(pagination.current_page - 1);
+                paginationElement.appendChild(prevButton);
+            }
+            
+            // 页码按钮
+            for (let i = 1; i <= pagination.total_pages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = i === pagination.current_page ? 'btn btn-primary' : 'btn btn-outline-secondary';
+                pageButton.textContent = i;
+                pageButton.onclick = () => pageCallback(i);
+                paginationElement.appendChild(pageButton);
+            }
+            
+            // 下一页
+            if (pagination.current_page < pagination.total_pages) {
+                const nextButton = document.createElement('button');
+                nextButton.className = 'btn btn-outline-secondary';
+                nextButton.textContent = '下一页';
+                nextButton.onclick = () => pageCallback(pagination.current_page + 1);
+                paginationElement.appendChild(nextButton);
+            }
+            
+            container.appendChild(paginationElement);
+        }
+
+        // 辅助函数
+        function getCheckTypeName(type) {
+            const typeMap = {
+                'incoming': '来料检查',
+                'in-process': '过程检查',
+                'final': '成品检查'
+            };
+            return typeMap[type] || type;
+        }
+
+        function getResultName(result) {
+            const resultMap = {
+                'passed': '通过',
+                'failed': '未通过',
+                'pending': '待检查'
+            };
+            return resultMap[result] || result;
+        }
+
+        function getResultClass(result) {
+            const classMap = {
+                'passed': 'badge-success',
+                'failed': 'badge-danger',
+                'pending': 'badge-warning'
+            };
+            return classMap[result] || 'badge-secondary';
+        }
+
+        function formatCheckItems(items) {
+            if (!items) return '';
+            if (Array.isArray(items)) {
+                return items.slice(0, 2).join(', ');
+            }
+            return items;
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN');
+        }
+    </script>
+</body>
+</html>

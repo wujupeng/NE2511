@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供应商管理 - 新能源精密追溯系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">新能源精密追溯系统</div>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/dashboard">仪表盘</a>
+            <a href="/products">产品管理</a>
+            <a href="/tracking">产品追踪</a>
+            <a href="/quality">质量检查</a>
+            <a href="/suppliers">供应商管理</a>
+            <a href="/devices">设备管理</a>
+        </div>
+        <div class="user-info">
+            <!-- 用户信息将通过JavaScript动态更新 -->
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <h1 class="page-title">供应商管理</h1>
+        
+        <!-- 搜索和操作区域 -->
+        <div class="search-actions">
+            <div class="search-container">
+                <input type="text" id="supplier-search" class="form-control" placeholder="搜索供应商名称或编码...">
+                <button class="btn btn-outline-secondary" onclick="searchSuppliers()">搜索</button>
+            </div>
+            <button class="btn btn-primary" onclick="openAddSupplierModal()">添加供应商</button>
+        </div>
+
+        <!-- 供应商列表 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">供应商列表</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>供应商编码</th>
+                                <th>供应商名称</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>状态</th>
+                                <th>合作等级</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliers-table-body">
+                            <!-- 供应商数据将通过JavaScript动态加载 -->
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="loading"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页控制 -->
+                <div class="pagination-container" id="pagination-container">
+                    <!-- 分页将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑供应商模态框 -->
+    <div class="modal" id="supplier-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">添加供应商</h5>
+                <button type="button" class="close" onclick="closeSupplierModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="supplier-form">
+                    <input type="hidden" id="supplier-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="supplier-code" class="form-label">供应商编码</label>
+                            <input type="text" id="supplier-code" name="supplier_code" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="supplier-name" class="form-label">供应商名称</label>
+                            <input type="text" id="supplier-name" name="supplier_name" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="contact-person" class="form-label">联系人</label>
+                            <input type="text" id="contact-person" name="contact_person" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="contact-phone" class="form-label">联系电话</label>
+                            <input type="text" id="contact-phone" name="contact_phone" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">电子邮箱</label>
+                        <input type="email" id="email" name="email" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address" class="form-label">地址</label>
+                        <textarea id="address" name="address" class="form-control" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="status" class="form-label">状态</label>
+                            <select id="status" name="status" class="form-control" required>
+                                <option value="">请选择状态</option>
+                                <option value="active">合作中</option>
+                                <option value="inactive">已停用</option>
+                                <option value="pending">待审核</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="cooperation-level" class="form-label">合作等级</label>
+                            <select id="cooperation-level" name="cooperation_level" class="form-control" required>
+                                <option value="">请选择等级</option>
+                                <option value="A">A级</option>
+                                <option value="B">B级</option>
+                                <option value="C">C级</option>
+                                <option value="D">D级</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="business-license" class="form-label">营业执照编号</label>
+                            <input type="text" id="business-license" name="business_license" class="form-control">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="tax-registration" class="form-label">税务登记号</label>
+                            <input type="text" id="tax-registration" name="tax_registration" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="supplier-type" class="form-label">供应商类型</label>
+                        <input type="text" id="supplier-type" name="supplier_type" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="products-provided" class="form-label">提供产品</label>
+                        <textarea id="products-provided" name="products_provided" class="form-control" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes" class="form-label">备注</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeSupplierModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveSupplier()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* 供应商管理页面额外样式 */
+        .search-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            color: #6c757d;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .search-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                max-width: 100%;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+    </style>
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSuppliers();
+        });
+
+        // 加载供应商列表
+        async function loadSuppliers(page = 1, searchQuery = '') {
+            try {
+                const response = await apiRequest(`/api/suppliers?page=${page}&search=${encodeURIComponent(searchQuery)}`);
+                const suppliers = response.items;
+                const pagination = response.pagination;
+                
+                const tableBody = document.getElementById('suppliers-table-body');
+                tableBody.innerHTML = '';
+                
+                if (suppliers.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center">暂无供应商数据</td></tr>';
+                    document.getElementById('pagination-container').innerHTML = '';
+                    return;
+                }
+                
+                suppliers.forEach(supplier => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${supplier.supplier_code}</td>
+                        <td>${supplier.supplier_name}</td>
+                        <td>${supplier.contact_person}</td>
+                        <td>${supplier.contact_phone}</td>
+                        <td><span class="badge ${getStatusClass(supplier.status)}">${getStatusName(supplier.status)}</span></td>
+                        <td>${supplier.cooperation_level || '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editSupplier(${JSON.stringify(supplier).replace(/"/g, '&quot;')})")>编辑</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteSupplier(${supplier.id})")>删除</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                // 生成分页
+                generatePagination(pagination, page => loadSuppliers(
+                    page, 
+                    document.getElementById('supplier-search').value
+                ));
+            } catch (error) {
+                showNotification('加载供应商失败: ' + error.message, 'error');
+            }
+        }
+
+        // 搜索供应商
+        function searchSuppliers() {
+            const searchQuery = document.getElementById('supplier-search').value;
+            loadSuppliers(1, searchQuery);
+        }
+
+        // 打开添加供应商模态框
+        function openAddSupplierModal() {
+            document.getElementById('modal-title').textContent = '添加供应商';
+            document.getElementById('supplier-form').reset();
+            document.getElementById('supplier-id').value = '';
+            document.getElementById('supplier-modal').style.display = 'flex';
+        }
+
+        // 编辑供应商
+        function editSupplier(supplier) {
+            document.getElementById('modal-title').textContent = '编辑供应商';
+            document.getElementById('supplier-id').value = supplier.id;
+            document.getElementById('supplier-code').value = supplier.supplier_code;
+            document.getElementById('supplier-name').value = supplier.supplier_name;
+            document.getElementById('contact-person').value = supplier.contact_person;
+            document.getElementById('contact-phone').value = supplier.contact_phone;
+            document.getElementById('email').value = supplier.email || '';
+            document.getElementById('address').value = supplier.address || '';
+            document.getElementById('status').value = supplier.status;
+            document.getElementById('cooperation-level').value = supplier.cooperation_level || '';
+            document.getElementById('business-license').value = supplier.business_license || '';
+            document.getElementById('tax-registration').value = supplier.tax_registration || '';
+            document.getElementById('supplier-type').value = supplier.supplier_type || '';
+            document.getElementById('products-provided').value = supplier.products_provided || '';
+            document.getElementById('notes').value = supplier.notes || '';
+            document.getElementById('supplier-modal').style.display = 'flex';
+        }
+
+        // 关闭供应商模态框
+        function closeSupplierModal() {
+            document.getElementById('supplier-modal').style.display = 'none';
+        }
+
+        // 保存供应商
+        async function saveSupplier() {
+            const supplierId = document.getElementById('supplier-id').value;
+            const data = {
+                supplier_code: document.getElementById('supplier-code').value,
+                supplier_name: document.getElementById('supplier-name').value,
+                contact_person: document.getElementById('contact-person').value,
+                contact_phone: document.getElementById('contact-phone').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                status: document.getElementById('status').value,
+                cooperation_level: document.getElementById('cooperation-level').value,
+                business_license: document.getElementById('business-license').value,
+                tax_registration: document.getElementById('tax-registration').value,
+                supplier_type: document.getElementById('supplier-type').value,
+                products_provided: document.getElementById('products-provided').value,
+                notes: document.getElementById('notes').value
+            };
+            
+            try {
+                let response;
+                if (supplierId) {
+                    response = await apiRequest(`/api/suppliers/${supplierId}`, 'PUT', data);
+                } else {
+                    response = await apiRequest('/api/suppliers', 'POST', data);
+                }
+                
+                closeSupplierModal();
+                loadSuppliers();
+                showNotification(response.message || '保存成功', 'success');
+            } catch (error) {
+                showNotification('保存失败: ' + error.message, 'error');
+            }
+        }
+
+        // 删除供应商
+        async function deleteSupplier(supplierId) {
+            if (confirm('确定要删除这个供应商吗？')) {
+                try {
+                    const response = await apiRequest(`/api/suppliers/${supplierId}`, 'DELETE');
+                    loadSuppliers();
+                    showNotification(response.message || '删除成功', 'success');
+                } catch (error) {
+                    showNotification('删除失败: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // 生成分页
+        function generatePagination(pagination, pageCallback) {
+            const container = document.getElementById('pagination-container');
+            container.innerHTML = '';
+            
+            if (pagination.total_pages <= 1) return;
+            
+            const paginationElement = document.createElement('div');
+            paginationElement.className = 'pagination';
+            
+            // 上一页
+            if (pagination.current_page > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.className = 'btn btn-outline-secondary';
+                prevButton.textContent = '上一页';
+                prevButton.onclick = () => pageCallback(pagination.current_page - 1);
+                paginationElement.appendChild(prevButton);
+            }
+            
+            // 页码按钮
+            for (let i = 1; i <= pagination.total_pages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = i === pagination.current_page ? 'btn btn-primary' : 'btn btn-outline-secondary';
+                pageButton.textContent = i;
+                pageButton.onclick = () => pageCallback(i);
+                paginationElement.appendChild(pageButton);
+            }
+            
+            // 下一页
+            if (pagination.current_page < pagination.total_pages) {
+                const nextButton = document.createElement('button');
+                nextButton.className = 'btn btn-outline-secondary';
+                nextButton.textContent = '下一页';
+                nextButton.onclick = () => pageCallback(pagination.current_page + 1);
+                paginationElement.appendChild(nextButton);
+            }
+            
+            container.appendChild(paginationElement);
+        }
+
+        // 辅助函数
+        function getStatusName(status) {
+            const statusMap = {
+                'active': '合作中',
+                'inactive': '已停用',
+                'pending': '待审核'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getStatusClass(status) {
+            const classMap = {
+                'active': 'badge-success',
+                'inactive': 'badge-danger',
+                'pending': 'badge-warning'
+            };
+            return classMap[status] || 'badge-secondary';
+        }
+    </script>
+</body>
+</html>

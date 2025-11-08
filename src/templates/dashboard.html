@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仪表盘 - 新能源精密追溯系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">新能源精密追溯系统</div>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/dashboard">仪表盘</a>
+            <a href="/products">产品管理</a>
+            <a href="/tracking">产品追踪</a>
+            <a href="/quality">质量检查</a>
+            <a href="/suppliers">供应商管理</a>
+            <a href="/devices">设备管理</a>
+        </div>
+        <div class="user-info">
+            <!-- 用户信息将通过JavaScript动态更新 -->
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <h1 class="page-title">仪表盘</h1>
+        
+        <!-- 统计数据区域 -->
+        <div id="dashboard-stats">
+            <!-- 统计数据将通过JavaScript动态加载 -->
+            <div class="loading"></div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3 class="chart-title">产品状态分布</h3>
+                <div id="product-status-chart" class="chart-placeholder">
+                    <!-- 图表将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-title">质量检查趋势</h3>
+                <div id="quality-trend-chart" class="chart-placeholder">
+                    <!-- 图表将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 快速操作 -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">快速操作</h3>
+            </div>
+            <div class="card-body">
+                <div class="quick-actions">
+                    <a href="/products" class="quick-action-item">
+                        <div class="quick-action-icon">📦</div>
+                        <div class="quick-action-text">管理产品</div>
+                    </a>
+                    <a href="/tracking" class="quick-action-item">
+                        <div class="quick-action-icon">🔍</div>
+                        <div class="quick-action-text">扫码追踪</div>
+                    </a>
+                    <a href="/quality" class="quick-action-item">
+                        <div class="quick-action-icon">✅</div>
+                        <div class="quick-action-text">质量检查</div>
+                    </a>
+                    <a href="/suppliers" class="quick-action-item">
+                        <div class="quick-action-icon">🤝</div>
+                        <div class="quick-action-text">供应商管理</div>
+                    </a>
+                    <a href="/devices" class="quick-action-item">
+                        <div class="quick-action-icon">⚙️</div>
+                        <div class="quick-action-text">设备管理</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 新能源精密追溯系统. 保留所有权利.</p>
+        </div>
+    </footer>
+
+    <style>
+        /* 仪表盘特有样式 */
+        .page-title {
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            color: #6c757d;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .quick-action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .quick-action-item:hover {
+            background-color: #e9ecef;
+            transform: translateY(-3px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-action-text {
+            font-weight: 500;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            padding: 1rem 0;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer p {
+            text-align: center;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+    </style>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
